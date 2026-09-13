@@ -11,6 +11,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import CarMake, CarModel
 from .populate import initiate
+from .restapis import analyze_review_sentiments
 
 logger = logging.getLogger(__name__)
 
@@ -71,3 +72,12 @@ def get_cars(request):
         })
 
     return JsonResponse({"CarModels": cars})
+@csrf_exempt
+def analyze_review(request):
+    if request.method == "POST":
+        body = json.loads(request.body)
+        review = body.get("review", "")
+        result = analyze_review_sentiments(review)
+        return JsonResponse(result)
+    return JsonResponse({"error": "POST request required"})
+
